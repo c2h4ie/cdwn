@@ -22,5 +22,5 @@ clean:
 	rm -rf $(BUILD_DIR) $(OUT)
 
 install: $(EXE)
-	install -D $(EXE) $(PREFIX)/$(EXE)
+	install -D $(OUT) $(PREFIX)/$(OUT)
 
