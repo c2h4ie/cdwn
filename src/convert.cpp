@@ -18,9 +18,11 @@ void input_error() {
 }
 
 int input_to_sec(std::string_view input) {
-  int seconds{0}, curr{0};
+  int seconds{};
+  int curr{};
+
   for (const auto &c : input) {
-    if (std::isdigit(c)) {
+    if (std::isdigit(c) != 0) {
       curr = curr * 10 + (c - '0');
     } else {
       switch (c) {

@@ -1,48 +1,27 @@
 #include "timers.hpp"
-#include <boost/process.hpp>
-#include <boost/program_options.hpp>
-#include <iostream>
+#include <print>
 #include <string>
+#include <vector>
 
-namespace bp = boost::process;
-namespace po = boost::program_options;
+constexpr void print_help() {
+  std::println(R"(Options:
+  --help, -h         Print help messages
+  --time, -t         Time for countdown
+  --stopwatch, -s    Start stopwatch)");
+}
 
 int main(int argc, char *argv[]) {
-  po::options_description desc("Options");
+  std::vector<std::string> args(argv + 1, argv + argc);
 
-  // clang-format off
-  desc.add_options()
-    ("help,h", "Print help messages")
-    ("command,c", po::value<std::string>(), "Command to execute")
-    ("time,t", po::value<std::string>(),"Time for countdown")
-    ("stopwatch,s", "Start stopwatch");
-  // clang-format on
-  try {
-    po::variables_map vm;
-    po::store(po::parse_command_line(argc, argv, desc), vm);
-    po::notify(vm);
-
-    if (vm.empty() || vm.count("help")) {
-      std::cout << desc << '\n';
+  for (size_t i{0}; i < args.size(); ++i) {
+    if (args[i] == "-h" || args[i] == "--help") {
+      print_help();
+    } else if (args[i] == "-t" || args[i] == "--time") {
+      if (i + 1 < args.size()) {
+        start_countdown(args[++i]);
+      }
+    } else if (args[i] == "-s" || args[i] == "--stopwatch") {
+      start_stopwatch();
     }
-
-    if (vm.count("time")) {
-      start_countdown(vm["time"].as<std::string>());
-    }
-
-    if (vm.count("stopwatch")) {
-      start_timer();
-    }
-
-    if (vm.count("command")) {
-      std::cout << '\n';
-      bp::system(vm["command"].as<std::string>(), bp::std_out > stdout);
-    }
-
-  } catch (const po::error &e) {
-    std::cerr << "Error: " << e.what() << '\n';
-    return 1;
   }
-
-  return 0;
 }

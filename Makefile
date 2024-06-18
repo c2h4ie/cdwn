@@ -1,28 +1,26 @@
-CXX := ccache g++
-CXXFLAGS := -Wall -Wextra -O3 -march=native -std=c++23 -flto
-LDFLAGS := -flto=auto -fuse-ld=mold
-LIBS := -lboost_program_options
-SRC := src/timers.cpp src/cdwn.cpp src/convert.cpp
-OBJ := $(SRC:src/%.cpp=obj/%.o)
-EXE := cdwn
+CXX := g++
+CXXFLAGS += -march=native -std=c++2c
+SRC_DIR := src
+BUILD_DIR := build
+OUT := cdwn
 PREFIX := /usr/local/bin
 
-.PHONY: clean install compdb
+SRCS = $(wildcard $(SRC_DIR)/*.cpp)
+OBJS = $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(SRCS))
 
-build: $(EXE)
+$(OUT): $(OBJS)
+	$(CXX) $(CXXFLAGS) -o $@ $^
 
-$(EXE): $(OBJ)
-	$(CXX) $(LDFLAGS) -o $@ $^ $(LIBS)
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp | $(BUILD_DIR)
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
-obj/%.o: src/%.cpp
-	@mkdir -p obj
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+$(BUILD_DIR):
+	mkdir -p $(BUILD_DIR)
 
+.PHONY: clean install
 clean:
-	rm -rf obj $(EXE)
+	rm -rf $(BUILD_DIR) $(OUT)
 
 install: $(EXE)
 	install -D $(EXE) $(PREFIX)/$(EXE)
 
-compdb:
-	bear -- $(MAKE) clean all

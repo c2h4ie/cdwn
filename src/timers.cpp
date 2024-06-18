@@ -13,7 +13,7 @@ void start_countdown(const std::string_view seconds) {
   }
 }
 
-void start_timer() {
+void start_stopwatch() {
   for (auto seconds_passed{0};; ++seconds_passed) {
     display_time("Time Elapsed:"sv, seconds_passed);
     std::this_thread::sleep_for(std::chrono::seconds(1));
